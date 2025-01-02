@@ -1,0 +1,66 @@
+{
+    "flexibility": {
+        "full_body": [
+            {
+                "name": "Forward Fold",
+                "link": "https://example.com/forward-fold"
+            },
+            {
+                "name": "Cat-Cow Stretch",
+                "link": "https://example.com/cat-cow-stretch"
+            }
+        ],
+        "legs": [
+            {
+                "name": "Hamstring Stretch",
+                "link": "https://example.com/hamstring-stretch"
+            },
+            {
+                "name": "Butterfly Pose",
+                "link": "https://example.com/butterfly-pose"
+            }
+        ],
+        "upper_body": [
+            {
+                "name": "Shoulder Stretch",
+                "link": "https://example.com/shoulder-stretch"
+            },
+            {
+                "name": "Neck Circles",
+                "link": "https://example.com/neck-circles"
+            }
+        ]
+    },
+    "strength": {
+        "chest": [
+            {
+                "name": "Push-ups",
+                "link": "https://example.com/push-ups"
+            },
+            {
+                "name": "Chest Fly",
+                "link": "https://example.com/chest-fly"
+            }
+        ],
+        "legs": [
+            {
+                "name": "Squats",
+                "link": "https://example.com/squats"
+            },
+            {
+                "name": "Lunges",
+                "link": "https://example.com/lunges"
+            }
+        ],
+        "back": [
+            {
+                "name": "Pull-ups",
+                "link": "https://example.com/pull-ups"
+            },
+            {
+                "name": "Deadlift",
+                "link": "https://example.com/deadlift"
+            }
+        ]
+    }
+}
