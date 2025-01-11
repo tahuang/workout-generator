@@ -1,42 +1,47 @@
 import json
 import os
 
-SAVE_DIR = "saved_data"
-WORKOUT_FILE = os.path.join(SAVE_DIR, "saved_workouts.json")
-TIMER_FILE = os.path.join(SAVE_DIR, "saved_timers.json")
+SAVED_WORKOUTS_PATH = "saved_data/workouts/"
+SAVED_TIMERS_PATH = "saved_data/timers/"
 
 
-def ensure_save_dir():
+def ensure_save_dir(dir):
     """Ensure the save directory exists."""
-    if not os.path.exists(SAVE_DIR):
-        os.makedirs(SAVE_DIR)
+    if not os.path.exists(dir):
+        os.makedirs(dir)
 
 
-def save_workout(workouts):
+def save_workout(filename, exercises):
     """Save workouts to a JSON file."""
-    ensure_save_dir()
-    with open(WORKOUT_FILE, "w") as f:
-        json.dump(workouts, f, indent=4)
+    ensure_save_dir(SAVED_WORKOUTS_PATH)
+    with open(os.path.join(SAVED_WORKOUTS_PATH, filename), "w") as f:
+        json.dump(exercises, f, indent=4)
 
 
-def load_workouts():
+def load_workouts(filename):
     """Load workouts from a JSON file."""
-    if os.path.exists(WORKOUT_FILE):
-        with open(WORKOUT_FILE, "r") as f:
+    full_path = os.path.join(SAVED_WORKOUTS_PATH, filename)
+    if os.path.exists(full_path):
+        with open(full_path, "r") as f:
             return json.load(f)
     return []
 
 
-def save_timer_config(timer_config):
+def save_timer_config(filename, timer_config):
     """Save timer configurations to a JSON file."""
-    ensure_save_dir()
-    with open(TIMER_FILE, "w") as f:
-        json.dump(timer_config, f, indent=4)
+    ensure_save_dir(SAVED_TIMERS_PATH)
+    with open(os.path.join(SAVED_TIMERS_PATH, filename), "w") as f:
+        json.dump(
+            timer_config,
+            f,
+            indent=4,
+        )
 
 
-def load_timer_config():
+def load_timer_config(filename):
     """Load timer configurations from a JSON file."""
-    if os.path.exists(TIMER_FILE):
-        with open(TIMER_FILE, "r") as f:
+    full_path = os.path.join(SAVED_TIMERS_PATH, filename)
+    if os.path.exists(full_path):
+        with open(full_path, "r") as f:
             return json.load(f)
-    return {"work_duration": 30, "rest_duration": 15, "rounds": 1}  # Default values
+    return []
