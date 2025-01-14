@@ -1,65 +1,307 @@
 {
-    "flexibility": {
-        "full_body": [
-            {
-                "name": "Forward Fold",
-                "link": "https://example.com/forward-fold"
-            },
-            {
-                "name": "Cat-Cow Stretch",
-                "link": "https://example.com/cat-cow-stretch"
-            }
-        ],
+    "stretches": {
         "legs": [
             {
                 "name": "Hamstring Stretch",
-                "link": "https://example.com/hamstring-stretch"
+                "link": "exercises/hamstring_stretch.jpg"
             },
             {
-                "name": "Butterfly Pose",
-                "link": "https://example.com/butterfly-pose"
+                "name": "Butterfly Stretch",
+                "link": "exercises/butterfly_stretch.jpg"
+            },
+            {
+                "name": "Forward Fold",
+                "link": "exercises/forward_bend.jpg"
+            },
+            {
+                "name": "Hip Flexor Stretch",
+                "link": "exercises/hip_flexor_stretch.jpg"
+            },
+            {
+                "name": "Pigeon Pose",
+                "link": "exercises/pigeon_pose.jpg"
+            },
+            {
+                "name": "Calf Stretch",
+                "link": "exercises/calf_stretch.jpg"
+            },
+            {
+                "name": "Quad Stretch",
+                "link": "exercises/quad_stretch.jpg"
+            },
+            {
+                "name": "Knee to Chest Stretch",
+                "link": "exercises/knee_to_chest_stretch.jpg"
+            },
+            {
+                "name": "Figure 4 Stretch",
+                "link": "exercises/figure4_stretch.jpg"
+            },
+            {
+                "name": "Ankle Circles",
+                "link": "https://www.youtube.com/watch?v=om1IAdzpKsg"
+            },
+            {
+                "name": "Downward Dog",
+                "link": "exercises/downward_dog.jpg"
             }
         ],
         "upper_body": [
             {
                 "name": "Shoulder Stretch",
-                "link": "https://example.com/shoulder-stretch"
+                "link": "exercises/shoulder_stretch.png"
             },
             {
                 "name": "Neck Circles",
-                "link": "https://example.com/neck-circles"
+                "link": "https://www.youtube.com/watch?v=9gSigEFGKjo"
+            },
+            {
+                "name": "Cobra Stretch",
+                "link": "exercises/cobra_stretch.jpg"
+            },
+            {
+                "name": "Child's Pose",
+                "link": "exercises/childs_pose.jpg"
+            },
+            {
+                "name": "Triceps Stretch",
+                "link": "exercises/triceps_stretch.jpg"
+            },
+            {
+                "name": "Arm Along the Wall",
+                "link": "exercises/arm_along_wall_stretch.png"
+            },
+            {
+                "name": "Forearm Stretch",
+                "link": "exercises/forearm_stretch.png"
+            },
+            {
+                "name": "Cat-Cow Stretch",
+                "link": "exercises/cat_cow_stretch.jpg"
+            },
+            {
+                "name": "Seated Torso Twist",
+                "link": "exercises/torso_twist.jpg"
+            },
+            {
+                "name": "Neck Stretch",
+                "link": "exercises/neck_stretch.png"
             }
         ]
     },
     "strength": {
-        "chest": [
-            {
-                "name": "Push-ups",
-                "link": "https://example.com/push-ups"
-            },
-            {
-                "name": "Chest Fly",
-                "link": "https://example.com/chest-fly"
-            }
-        ],
         "legs": [
             {
-                "name": "Squats",
-                "link": "https://example.com/squats"
+                "name": "Back Squat",
+                "link": "exercises/back_squat.jpg"
             },
             {
-                "name": "Lunges",
-                "link": "https://example.com/lunges"
-            }
-        ],
-        "back": [
-            {
-                "name": "Pull-ups",
-                "link": "https://example.com/pull-ups"
+                "name": "Front Squat",
+                "link": "exercises/front_squat.jpg"
             },
             {
                 "name": "Deadlift",
-                "link": "https://example.com/deadlift"
+                "link": "https://www.youtube.com/watch?v=AweC3UaM14o"
+            },
+            {
+                "name": "Kettlebell Swing",
+                "link": "exercises/kettlebell_swing.jpg"
+            },
+            {
+                "name": "Dumbbell Lunge",
+                "link": "exercises/dumbbell_lunge.jpg"
+            },
+            {
+                "name": "Step Up",
+                "link": "https://www.youtube.com/watch?v=DxUNi119Qzs"
+            },
+            {
+                "name": "Split Squat",
+                "link": "exercises/split_squat.jpg"
+            },
+            {
+                "name": "Calf Raises",
+                "link": "https://www.youtube.com/watch?v=GyWw_Q_aIbE"
+            },
+            {
+                "name": "Single Leg Deadlift",
+                "link": "https://www.youtube.com/watch?v=VnHvZtV8Gz0"
+            }
+        ],
+        "upper_body": [
+            {
+                "name": "Bench Press",
+                "link": "exercises/bench_press.jpg"
+            },
+            {
+                "name": "Bicep Curl",
+                "link": "exercises/bicep_curl.jpg"
+            },
+            {
+                "name": "Hammer Curl",
+                "link": "https://www.youtube.com/watch?v=fM0TQLoesLs"
+            },
+            {
+                "name": "Push Press",
+                "link": "https://www.youtube.com/watch?v=d0d0TWaiukA"
+            },
+            {
+                "name": "Hang Clean",
+                "link": "https://www.youtube.com/watch?v=0aP3tgKZcHQ"
+            },
+            {
+                "name": "Hang Clean and Jerk",
+                "link": "https://www.youtube.com/watch?v=effHyYyGIdc"
+            },
+            {
+                "name": "Single Arm Dumbbell Snatch",
+                "link": "https://www.youtube.com/watch?v=3mlhF3dptAo"
+            },
+            {
+                "name": "Shoulder Press",
+                "link": "https://www.youtube.com/watch?v=5yWaNOvgFCM"
+            },
+            {
+                "name": "Arnold Press",
+                "link": "https://www.youtube.com/watch?v=R-RTgOxrj88"
+            },
+            {
+                "name": "Barbell Row",
+                "link": "https://www.youtube.com/watch?v=9Gf-Ourup_k"
+            },
+            {
+                "name": "Cable Row",
+                "link": "exercises/cable_row.jpg"
+            },
+            {
+                "name": "Cable Fly",
+                "link": "https://www.youtube.com/watch?v=hhruLxo9yZU"
+            },
+            {
+                "name": "Lat Pull Down",
+                "link": "https://www.youtube.com/watch?v=JGeRYIZdojU"
+            }
+        ],
+        "abs": [
+            {
+                "name": "Knees to Elbows",
+                "link": "https://www.youtube.com/watch?v=pXsatWUT5d0"
+            },
+            {
+                "name": "Kettlebell Alternating Leg V Up",
+                "link": "https://www.youtube.com/watch?v=-R9PtgTg0zs"
+            },
+            {
+                "name": "Medicine Ball Sit-Up",
+                "link": "https://www.youtube.com/watch?v=uG1dBsUljlE"
+            },
+            {
+                "name": "Exercise Ball Crunch",
+                "link": "https://www.youtube.com/watch?v=O4d3kd1ZLyc"
+            },
+            {
+                "name": "Exercise Ball Side Crunch",
+                "link": "https://www.youtube.com/watch?v=xvAXsVmUDkY"
+            }
+        ],
+        "cardio": [
+            {
+                "name": "Jumping Jacks",
+                "link": "exercises/jumping_jacks.jpg"
+            },
+            {
+                "name": "Lunge Jumps",
+                "link": "https://www.youtube.com/watch?v=iJMsF7fzrOM"
+            },
+            {
+                "name": "Jump Squats",
+                "link": "https://www.youtube.com/watch?v=BRfxI2Es2lE"
+            },
+            {
+                "name": "Skater Jumps",
+                "link": "https://www.youtube.com/watch?v=Xz27DudBfSs"
+            },
+            {
+                "name": "Log Jumps",
+                "link": "https://www.youtube.com/watch?v=mdh5LQA4IlY"
+            },
+            {
+                "name": "Ickey Shuffle",
+                "link": "https://www.youtube.com/watch?v=aW-FQMXhPgM"
+            },
+            {
+                "name": "Jump and Shuffle Back",
+                "link": "https://www.youtube.com/watch?v=p7RcBP6VM5c"
+            },
+            {
+                "name": "Burpees",
+                "link": "https://www.youtube.com/watch?v=TU8QYVW0gDU"
+            },
+            {
+                "name": "Jump Rope",
+                "link": "exercises/jump_rope.jpg"
+            }
+        ]
+    },
+    "mobility": {
+        "legs": [
+            {
+                "name": "Single Leg Tap",
+                "link": "https://www.youtube.com/watch?v=oqEUz867eKs"
+            },
+            {
+                "name": "Forward Lunge",
+                "link": "https://www.youtube.com/watch?v=g8-Ge9S0aUw"
+            },
+            {
+                "name": "Reverse Lunge",
+                "link": "https://www.youtube.com/watch?v=xrPteyQLGAo"
+            },
+            {
+                "name": "Step Up",
+                "link": "https://www.youtube.com/watch?v=DxUNi119Qzs"
+            },
+            {
+                "name": "ATG Split Squat",
+                "link": "https://www.youtube.com/watch?v=py0ovq2AIEw"
+            },
+            {
+                "name": "Single Leg Deadlift",
+                "link": "https://www.youtube.com/watch?v=VnHvZtV8Gz0"
+            },
+            {
+                "name": "Skater Jumps",
+                "link": "https://www.youtube.com/watch?v=Xz27DudBfSs"
+            },
+            {
+                "name": "Deep Squat",
+                "link": "https://www.youtube.com/watch?v=dfg0wxIGPIc"
+            },
+            {
+                "name": "Hip Lift",
+                "link": "https://www.youtube.com/shorts/z0RZ-KUXDc8"
+            },
+            {
+                "name": "Glute Bridge",
+                "link": "exercises/glute_bridge.jpg"
+            },
+            {
+                "name": "Anterior Tibialis Raise",
+                "link": "https://www.youtube.com/watch?v=VzIcGAgBiaM"
+            }
+        ],
+        "upper_body": [
+            {
+                "name": "Turkish Get Up",
+                "link": "https://www.youtube.com/watch?v=-QEE1Q4iW-w"
+            },
+            {
+                "name": "Chop Down",
+                "link": "https://www.youtube.com/shorts/aDuwnJLebKE"
+            },
+            {
+                "name": "Lift Up",
+                "link": "https://www.youtube.com/shorts/BpO3i_52J1c"
             }
         ]
     }

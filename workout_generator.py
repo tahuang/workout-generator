@@ -1,8 +1,10 @@
 import os
-from tkinter import ttk
+from PIL import Image, ImageTk
+from tkinter import messagebox, ttk
 import tkinter as tk
 from utils.exercise_selector import ExerciseSelector
 import utils.file_operations as file_ops
+import webbrowser
 
 
 class WorkoutTimerGUI:
@@ -12,6 +14,7 @@ class WorkoutTimerGUI:
         self.selector = ExerciseSelector("exercises.json")
         self.exercises = []
         self.num_exercises = 0
+        self.exercise_imgs = {}
 
         # Global variables to track paused state.
         self.paused = False
@@ -66,51 +69,65 @@ class WorkoutTimerGUI:
     def create_workout(self, loaded_workout, loaded_timer):
         """Create a new workout or load a workout/timer config."""
         if loaded_timer.get():
-            timer_config = file_ops.load_timer_config(loaded_timer.get())
-            self.num_rounds = timer_config["rounds"]
-            self.work_duration = timer_config["work_duration"]
-            self.rest_duration = timer_config["rest_duration"]
+            self.timer_config = file_ops.load_timer_config(loaded_timer.get())
 
         if loaded_workout.get():
             self.exercises = file_ops.load_workouts(loaded_workout.get())
             self.num_exercises = len(self.exercises)
-            self.create_exercise_slots(None)
+            self.create_exercise_slots(None, None)
         else:
-            self.input_num_exercises()
+            self.input_new_workout_params()
 
-    def input_num_exercises(self):
+    def input_new_workout_params(self):
         """Input the number of exercises."""
-        # Clear previous content
+        # Clear previous content.
         for widget in self.root.winfo_children():
             widget.destroy()
 
         frame = tk.Frame(self.root)
         frame.pack(pady=20)
 
-        # Input number of exercises
+        # Input number of exercises.
         tk.Label(frame, text="Number of Exercises:", font=("Arial", 14)).pack()
         num = tk.Entry(frame, width=5)
         num.pack(pady=5)
 
+        # Select no equipment or with equipment.
+        tk.Label(frame, text="Equipment?", font=("Arial", 14)).pack()
+        equipment = ttk.Combobox(
+            frame,
+            values=["No Equipment", "Equipment"],
+            state="readonly",
+            width=20,
+        )
+        equipment.pack(pady=10)
+
         tk.Button(
             frame,
             text="Create Exercise Slots",
-            command=lambda: self.create_exercise_slots(num),
+            command=lambda: self.create_exercise_slots(num, equipment),
         ).pack(pady=10)
 
-    def create_exercise_slots(self, num_exercise_entry):
+    def create_exercise_slots(self, num_exercise_entry, equipment_entry):
         """Create slots for exercises and timer configuration in one window."""
         if num_exercise_entry:
             try:
                 self.num_exercises = int(num_exercise_entry.get())
             except ValueError:
-                tk.messagebox.showerror(
+                messagebox.showerror(
                     "Error", "Please enter a valid number of exercises!"
                 )
                 return
+        if equipment_entry:
+            equipment = equipment_entry.get() == "Equipment"
+            self.selector = (
+                ExerciseSelector("exercises.json")
+                if equipment
+                else ExerciseSelector("no_equipment_exercises.json")
+            )
 
         if self.num_exercises <= 0:
-            tk.messagebox.showerror(
+            messagebox.showerror(
                 "Error", "Number of exercises must be greater than zero!"
             )
             return
@@ -128,7 +145,7 @@ class WorkoutTimerGUI:
         tk.Label(frame, text="Configure Exercises:", font=("Arial", 16)).pack(pady=10)
         for i in range(self.num_exercises):
             exercise = None
-            if i < len(self.exercises) - 1:
+            if i < len(self.exercises):
                 exercise = self.exercises[i]
 
             tk.Label(frame, text=f"Exercise {i + 1}:", font=("Arial", 12)).pack(
@@ -139,22 +156,12 @@ class WorkoutTimerGUI:
             manual_entry = tk.Entry(
                 frame,
                 width=30,
-                fg=(
-                    "black"
-                    if exercise
-                    and not exercise.get("type")
-                    and not exercise.get("body_part")
-                    else "grey"
-                ),
+                fg=("black" if exercise else "grey"),
             )
             placeholder_text = "Enter custom exercise (optional)"
             manual_entry.insert(
                 0,
-                (
-                    exercise["name"]
-                    if exercise and not exercise["type"] and not exercise["body_part"]
-                    else placeholder_text
-                ),
+                (exercise["name"] if exercise else placeholder_text),
             )
 
             # Bind events to handle placeholder behavior
@@ -190,18 +197,11 @@ class WorkoutTimerGUI:
             body_part_label.grid(row=0, column=2, padx=5)
             body_part_box = ttk.Combobox(
                 random_frame,
-                values=["full_body", "legs", "chest", "abs", "upper_body"],
+                values=["legs", "upper_body", "abs", "cardio"],
                 state="readonly",
                 width=12,
             )
             body_part_box.grid(row=0, column=3, padx=5)
-
-            # Set dropdown values based on stored exercise data
-            if exercise:
-                if exercise.get("type"):
-                    type_box.set(exercise["type"])
-                if exercise.get("body_part"):
-                    body_part_box.set(exercise["body_part"])
 
             self.exercise_entries.append((manual_entry, type_box, body_part_box))
 
@@ -213,8 +213,8 @@ class WorkoutTimerGUI:
             anchor="w", pady=2
         )
         num_rounds_entry = tk.Entry(frame, width=10)
-        if self.timer_config.get("num_rounds"):
-            num_rounds_entry.insert(0, self.timer_config["num_rounds"])
+        if self.timer_config.get("rounds"):
+            num_rounds_entry.insert(0, self.timer_config["rounds"])
         num_rounds_entry.pack(anchor="w", pady=5)
 
         # Work Duration
@@ -248,7 +248,9 @@ class WorkoutTimerGUI:
         self, num_rounds_entry, work_duration_entry, rest_duration_entry
     ):
         """Show a preview of the workout and timer settings after validation."""
-        self.exercises = []
+        loaded_exercises = len(self.exercises) != 0
+        if not loaded_exercises:
+            self.exercises = []
 
         for i, entry in enumerate(self.exercise_entries):
             manual_entry, type_box, body_part_box = entry
@@ -276,14 +278,14 @@ class WorkoutTimerGUI:
                     exercise_name, link = self.selector.select_exercise(None, body_part)
                 else:
                     # If nothing is input, show an error.
-                    tk.messagebox.showerror(
+                    messagebox.showerror(
                         "Error",
                         f"Please fill out all exercise fields for Exercise {i + 1} correctly.\n"
                         "Ensure you select at least one of type and body part for random exercises or manually input an exercise.",
                     )
                     return  # Prevent proceeding to preview
 
-            if exercise_name:
+            if exercise_name and not loaded_exercises:
                 self.exercises.append(
                     {
                         "name": exercise_name,
@@ -292,16 +294,17 @@ class WorkoutTimerGUI:
                         "body_part": body_part,
                     }
                 )
-            else:
+                self.selector.remove_exercise(exercise_name)
+            elif not loaded_exercises:
                 # If an exercise is empty or invalid, show an error
-                tk.messagebox.showerror(
+                messagebox.showerror(
                     "Error",
                     f"Exercise {i + 1} could not be found for this combination of type and body part.",
                 )
                 return  # Prevent proceeding to preview
 
         if not self.exercises:
-            tk.messagebox.showerror("Error", "No exercises selected!")
+            messagebox.showerror("Error", "No exercises selected!")
             return
 
         # Validate timer settings
@@ -310,13 +313,13 @@ class WorkoutTimerGUI:
             rest_duration = int(rest_duration_entry.get())
             rounds = int(num_rounds_entry.get())
         except ValueError:
-            tk.messagebox.showerror(
+            messagebox.showerror(
                 "Error", "Please enter valid numeric values for the timer settings."
             )
             return
 
         if work_duration <= 0 or rest_duration < 0 or rounds <= 0:
-            tk.messagebox.showerror("Error", "Timer values must be positive numbers.")
+            messagebox.showerror("Error", "Timer values must be positive numbers.")
             return
 
         self.timer_config = {
@@ -335,7 +338,7 @@ class WorkoutTimerGUI:
             widget.destroy()
 
         frame = tk.Frame(self.root)
-        frame.pack(pady=20)
+        frame.pack(padx=20, pady=20)
 
         tk.Label(frame, text="Workout Preview", font=("Arial", 16)).pack(pady=10)
 
@@ -343,6 +346,26 @@ class WorkoutTimerGUI:
             tk.Label(frame, text=f"{i}. {exercise['name']}", font=("Arial", 12)).pack(
                 anchor="w"
             )
+            # Show the exercise image or link to video.
+            if exercise["link"][-3:] == "jpg" or exercise["link"][-3:] == "png":
+                img = Image.open(exercise["link"])  # Load the image file
+                img = img.resize((200, 200))  # Resize the image (optional)
+                img = ImageTk.PhotoImage(img)  # Convert to PhotoImage
+                self.exercise_imgs[exercise["name"]] = img
+                tk.Label(frame, image=img).pack()
+            else:
+                video_link = tk.Label(
+                    frame,
+                    text=f"{exercise['name']} example link",
+                    fg="blue",
+                    cursor="hand2",
+                    font=("Arial", 12, "underline"),
+                )
+                video_link.pack(pady=10)
+                # Bind the click event to the open_link function
+                video_link.bind(
+                    "<Button-1>", lambda e, link=exercise["link"]: webbrowser.open(link)
+                )
 
         timer_info = (
             f"Timer: {self.timer_config['work_duration']}s work, "
@@ -365,7 +388,9 @@ class WorkoutTimerGUI:
 
         # Add Back to Edit button
         tk.Button(
-            frame, text="Back to Edit", command=lambda: self.create_exercise_slots(None)
+            frame,
+            text="Back to Edit",
+            command=lambda: self.create_exercise_slots(None, None),
         ).pack(pady=5)
 
         # Add Start Timer button
@@ -411,10 +436,16 @@ class WorkoutTimerGUI:
         frame.pack(pady=20)
 
         # Timer widgets
+        round_label = tk.Label(frame, text="", font=("Arial", 16))
+        round_label.pack(pady=10)
+
         current_exercise_label = tk.Label(frame, text="", font=("Arial", 16))
         current_exercise_label.pack(pady=10)
 
-        timer_label = tk.Label(frame, text="", font=("Arial", 20, "bold"))
+        exercise_link_label = tk.Label(frame)
+        exercise_link_label.pack(pady=10)
+
+        timer_label = tk.Label(frame, text="", font=("Arial", 16, "bold"))
         timer_label.pack(pady=10)
 
         phase_label = tk.Label(frame, text="", font=("Arial", 14))
@@ -446,16 +477,33 @@ class WorkoutTimerGUI:
         pause_button = tk.Button(frame, text="⏸️ Pause", command=toggle_pause)
         pause_button.pack(pady=5)
 
-        def update_timer(remaining, phase, exercise, elapsed, total, next_action):
+        def update_timer(
+            remaining,
+            round,
+            phase,
+            exercise,
+            exercise_link,
+            elapsed,
+            total,
+            next_action,
+        ):
             """Update the GUI timer labels and progress bars."""
             if self.paused:
                 # Save the paused event
                 self.pause_event = lambda: update_timer(
-                    remaining, phase, exercise, elapsed, total, next_action
+                    remaining,
+                    round,
+                    phase,
+                    exercise,
+                    exercise_link,
+                    elapsed,
+                    total,
+                    next_action,
                 )
                 return
 
             # Update labels
+            round_label.config(text=f"Round: {round}")
             mins, secs = divmod(remaining, 60)
             timer_label.config(text=f"{mins:02}:{secs:02}")
             current_exercise_label.config(
@@ -463,6 +511,21 @@ class WorkoutTimerGUI:
                     f"🚀 Exercise: {exercise}" if phase == "WORKING" else "😌 Rest Time"
                 )
             )
+            if self.exercise_imgs.get(exercise):
+                exercise_link_label.config(image=self.exercise_imgs[exercise])
+            elif exercise_link:
+                exercise_link_label.config(
+                    text=f"{exercise} example link",
+                    fg="blue",
+                    cursor="hand2",
+                    font=("Arial", 12, "underline"),
+                )
+                # Bind the click event to the open_link function
+                exercise_link_label.bind(
+                    "<Button-1>", lambda e, link=exercise_link: webbrowser.open(link)
+                )
+            else:
+                exercise_link_label.config(image="", text="")
             phase_label.config(text=f"Phase: {phase}")
 
             # Update progress bars
@@ -475,8 +538,10 @@ class WorkoutTimerGUI:
                     1000,
                     update_timer,
                     remaining - 1,
+                    round,
                     phase,
                     exercise,
+                    exercise_link,
                     elapsed + 1,
                     total,
                     next_action,
@@ -484,20 +549,34 @@ class WorkoutTimerGUI:
             else:
                 next_action()
 
-        def start_work(exercise, next_phase):
+        def start_work(round, exercise, exercise_link, next_phase):
             """Start the work phase for an exercise."""
             nonlocal step_count
             step_count += work_duration
             update_timer(
-                work_duration, "WORKING", exercise, 0, work_duration, next_phase
+                work_duration,
+                round,
+                "WORKING",
+                exercise,
+                exercise_link,
+                0,
+                work_duration,
+                next_phase,
             )
 
-        def start_rest(next_exercise_action):
+        def start_rest(round, next_exercise_action):
             """Start the rest phase between exercises."""
             nonlocal step_count
             step_count += rest_duration
             update_timer(
-                rest_duration, "RESTING", "Rest", 0, rest_duration, next_exercise_action
+                rest_duration,
+                round,
+                "RESTING",
+                "Rest",
+                None,
+                0,
+                rest_duration,
+                next_exercise_action,
             )
 
         def next_exercise(round_index, exercise_index):
@@ -505,30 +584,29 @@ class WorkoutTimerGUI:
             if exercise_index < len(exercises):
                 # Next exercise in the same round
                 start_work(
+                    round_index,
                     exercises[exercise_index]["name"],
+                    exercises[exercise_index]["link"],
                     lambda: start_rest(
-                        lambda: next_exercise(round_index, exercise_index + 1)
+                        round_index,
+                        lambda: next_exercise(round_index, exercise_index + 1),
                     ),
                 )
-            elif round_index < rounds - 1:
+            elif round_index < rounds:
                 # Start the next round
                 next_exercise(round_index + 1, 0)
             else:
                 # Workout complete
-                timer_label.config(text="🎉 Workout Complete!")
+                round_label.config(text="🎉 Workout Complete!")
                 current_exercise_label.config(text="Great job! 💪")
+                timer_label.config(text="")
+                exercise_link_label.config(image="", text="")
                 phase_label.config(text="")
                 individual_progress["value"] = 100
                 overall_progress["value"] = 100
 
         # Start the timer
-        next_exercise(0, 0)
-
-    def open_link(self, link):
-        """Open the exercise link in the browser."""
-        import webbrowser
-
-        webbrowser.open(link)
+        next_exercise(1, 0)
 
 
 if __name__ == "__main__":

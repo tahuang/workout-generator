@@ -1,0 +1,20 @@
+[
+    {
+        "name": "Arm Along the Wall",
+        "link": "exercises/arm_along_wall_stretch.png",
+        "type": "stretches",
+        "body_part": ""
+    },
+    {
+        "name": "Calf Raises",
+        "link": "https://www.youtube.com/watch?v=UV8gOrHmuKc",
+        "type": "strength",
+        "body_part": ""
+    },
+    {
+        "name": "Forearm Stretch",
+        "link": "exercises/forearm_stretch.png",
+        "type": "stretches",
+        "body_part": ""
+    }
+]

@@ -4,6 +4,7 @@ import random
 
 class ExerciseSelector:
     def __init__(self, exercise_bank_file):
+        self.exercise_bank_file = exercise_bank_file
         self.exercise_bank = self.load_exercise_bank(exercise_bank_file)
 
     def load_exercise_bank(self, file_path):
@@ -34,7 +35,7 @@ class ExerciseSelector:
             exercises = self.exercise_bank[category][body_part]
             exercise = random.choice(exercises)
             return exercise["name"], exercise["link"]
-        except KeyError:
+        except (KeyError, IndexError):
             return None, None
 
     def manual_entry(self, exercise_name):
@@ -44,3 +45,16 @@ class ExerciseSelector:
     def exercise_categories(self):
         """Return categories present in the exercise bank."""
         return list(self.exercise_bank.keys())
+
+    def remove_exercise(self, exercise_name):
+        """Remove exercise from the exercise bank if it exists to avoid duplicate exercise selection."""
+        for category in self.exercise_bank.keys():
+            for body_part in self.exercise_bank[category].keys():
+                exercises = self.exercise_bank[category][body_part]
+                for exercise in exercises:
+                    if exercise["name"] == exercise_name:
+                        exercises.remove(exercise)
+
+    def reset(self):
+        """Reset the exercise selector to the original exercise bank."""
+        self.exercise_bank = self.load_exercise_bank(self.exercise_bank_file)

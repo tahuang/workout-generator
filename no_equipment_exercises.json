@@ -1,0 +1,218 @@
+{
+    "stretches": {
+        "legs": [
+            {
+                "name": "Hamstring Stretch",
+                "link": "exercises/hamstring_stretch.jpg"
+            },
+            {
+                "name": "Butterfly Stretch",
+                "link": "exercises/butterfly_stretch.jpg"
+            },
+            {
+                "name": "Forward Fold",
+                "link": "exercises/forward_bend.jpg"
+            },
+            {
+                "name": "Hip Flexor Stretch",
+                "link": "exercises/hip_flexor_stretch.jpg"
+            },
+            {
+                "name": "Pigeon Pose",
+                "link": "exercises/pigeon_pose.jpg"
+            },
+            {
+                "name": "Calf Stretch",
+                "link": "exercises/calf_stretch.jpg"
+            },
+            {
+                "name": "Quad Stretch",
+                "link": "exercises/quad_stretch.jpg"
+            },
+            {
+                "name": "Knee to Chest Stretch",
+                "link": "exercises/knee_to_chest_stretch.jpg"
+            },
+            {
+                "name": "Figure 4 Stretch",
+                "link": "exercises/figure4_stretch.jpg"
+            },
+            {
+                "name": "Ankle Circles",
+                "link": "https://www.youtube.com/watch?v=om1IAdzpKsg"
+            },
+            {
+                "name": "Downward Dog",
+                "link": "exercises/downward_dog.jpg"
+            }
+        ],
+        "upper_body": [
+            {
+                "name": "Shoulder Stretch",
+                "link": "exercises/shoulder_stretch.png"
+            },
+            {
+                "name": "Neck Circles",
+                "link": "https://www.youtube.com/watch?v=9gSigEFGKjo"
+            },
+            {
+                "name": "Cobra Stretch",
+                "link": "exercises/cobra_stretch.jpg"
+            },
+            {
+                "name": "Child's Pose",
+                "link": "exercises/childs_pose.jpg"
+            },
+            {
+                "name": "Triceps Stretch",
+                "link": "exercises/triceps_stretch.jpg"
+            },
+            {
+                "name": "Arm Along the Wall",
+                "link": "exercises/arm_along_wall_stretch.png"
+            },
+            {
+                "name": "Forearm Stretch",
+                "link": "exercises/forearm_stretch.png"
+            },
+            {
+                "name": "Cat-Cow Stretch",
+                "link": "exercises/cat_cow_stretch.jpg"
+            },
+            {
+                "name": "Seated Torso Twist",
+                "link": "exercises/torso_twist.jpg"
+            },
+            {
+                "name": "Neck Stretch",
+                "link": "exercises/neck_stretch.png"
+            }
+        ]
+    },
+    "strength": {
+        "legs": [
+            {
+                "name": "Air Squats",
+                "link": "https://www.youtube.com/watch?v=l83R5PblSMA"
+            },
+            {
+                "name": "Forward Lunge",
+                "link": "https://www.youtube.com/watch?v=g8-Ge9S0aUw"
+            },
+            {
+                "name": "Reverse Lunge",
+                "link": "https://www.youtube.com/watch?v=xrPteyQLGAo"
+            },
+            {
+                "name": "Calf Raises",
+                "link": "https://www.youtube.com/watch?v=UV8gOrHmuKc"
+            },
+            {
+                "name": "Anterior Tibialis Raise",
+                "link": "https://www.youtube.com/watch?v=VzIcGAgBiaM"
+            },
+            {
+                "name": "Pistol Squat",
+                "link": "exercises/pistol_squat.jpg"
+            }
+        ],
+        "upper_body": [
+            {
+                "name": "Push Ups",
+                "link": "exercises/push_up.jpg"
+            },
+            {
+                "name": "Diamond Push Ups",
+                "link": "exercises/diamond_push_up.jpg"
+            },
+            {
+                "name": "Plank Shoulder Taps",
+                "link": "exercises/plank_shoulder_tap.jpg"
+            },
+            {
+                "name": "Spiderman Push Ups",
+                "link": "https://www.youtube.com/watch?v=O4ykWemt47k"
+            },
+            {
+                "name": "Tricep Dips",
+                "link": "exercises/tricep_dip.jpg"
+            }
+        ],
+        "abs": [
+            {
+                "name": "Leg Raises",
+                "link": "exercises/leg_raise.jpg"
+            },
+            {
+                "name": "Deadbug",
+                "link": "exercises/deadbug.jpg"
+            },
+            {
+                "name": "Oblique Toe Touches",
+                "link": "https://www.youtube.com/watch?v=24Ggj_xYFQU"
+            },
+            {
+                "name": "Flutter Kicks",
+                "link": "https://www.youtube.com/watch?v=WRnq49TAv-w"
+            },
+            {
+                "name": "V Crunches",
+                "link": "https://www.youtube.com/watch?v=yqKlM6WUkQA"
+            },
+            {
+                "name": "Crunches",
+                "link": "exercises/crunch.jpg"
+            },
+            {
+                "name": "Bicycle Crunches",
+                "link": "exercises/bicycle_crunch.jpg"
+            },
+            {
+                "name": "Side Crunches",
+                "link": "https://www.youtube.com/watch?v=q0QyCrpiNgI"
+            },
+            {
+                "name": "Plank",
+                "link": "exercises/plank.jpg"
+            },
+            {
+                "name": "Side Plank",
+                "link": "exercises/side_plank.jpg"
+            }
+        ],
+        "cardio": [
+            {
+                "name": "Jumping Jacks",
+                "link": "exercises/jumping_jacks.jpg"
+            },
+            {
+                "name": "Lunge Jumps",
+                "link": "https://www.youtube.com/watch?v=iJMsF7fzrOM"
+            },
+            {
+                "name": "Jump Squats",
+                "link": "https://www.youtube.com/watch?v=BRfxI2Es2lE"
+            },
+            {
+                "name": "Skater Jumps",
+                "link": "https://www.youtube.com/watch?v=Xz27DudBfSs"
+            },
+            {
+                "name": "Log Jumps",
+                "link": "https://www.youtube.com/watch?v=mdh5LQA4IlY"
+            },
+            {
+                "name": "Ickey Shuffle",
+                "link": "https://www.youtube.com/watch?v=aW-FQMXhPgM"
+            },
+            {
+                "name": "Jump and Shuffle Back",
+                "link": "https://www.youtube.com/watch?v=p7RcBP6VM5c"
+            },
+            {
+                "name": "Burpees",
+                "link": "https://www.youtube.com/watch?v=TU8QYVW0gDU"
+            }
+        ]
+    }
+}

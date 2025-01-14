@@ -1,0 +1,14 @@
+[
+    {
+        "name": "Plank Shoulder Taps",
+        "link": "exercises/plank_shoulder_tap.jpg",
+        "type": "strength",
+        "body_part": ""
+    },
+    {
+        "name": "Cat-Cow Stretch",
+        "link": "exercises/cat_cow_stretch.jpg",
+        "type": "stretches",
+        "body_part": ""
+    }
+]
