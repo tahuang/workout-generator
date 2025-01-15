@@ -38,10 +38,6 @@ class ExerciseSelector:
         except (KeyError, IndexError):
             return None, None
 
-    def manual_entry(self, exercise_name):
-        """Manually add an exercise to the selection."""
-        return exercise_name, None
-
     def exercise_categories(self):
         """Return categories present in the exercise bank."""
         return list(self.exercise_bank.keys())
@@ -54,7 +50,3 @@ class ExerciseSelector:
                 for exercise in exercises:
                     if exercise["name"] == exercise_name:
                         exercises.remove(exercise)
-
-    def reset(self):
-        """Reset the exercise selector to the original exercise bank."""
-        self.exercise_bank = self.load_exercise_bank(self.exercise_bank_file)
