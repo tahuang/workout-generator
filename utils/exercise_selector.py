@@ -1,3 +1,5 @@
+"""Exercise selector class."""
+
 import json
 import random
 

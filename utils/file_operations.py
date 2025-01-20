@@ -21,11 +21,14 @@ def save_workout(filename, exercises):
 
 def load_workouts(filename):
     """Load workouts from a JSON file."""
+    workout = {}
     full_path = os.path.join(SAVED_WORKOUTS_PATH, filename)
     if os.path.exists(full_path):
         with open(full_path, "r") as f:
-            return json.load(f)
-    return []
+            exercises = json.load(f)
+        for exercise in exercises:
+            workout[exercise["name"]] = exercise
+    return workout
 
 
 def save_timer_config(filename, timer_config):
@@ -54,8 +57,8 @@ def save_data(frame, filename_entry, func, *args):
     frame.destroy()
 
 
-def input_filename(root, func, *args):
-    """Choose a filename to save data."""
+def input_filename_tk(root, func, *args):
+    """Choose a filename to save data for TKinter."""
     frame = tk.Frame(root)
     frame.pack(pady=20)
 

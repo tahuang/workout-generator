@@ -1,289 +1,111 @@
 import os
-from PIL import Image, ImageTk
-from tkinter import messagebox, ttk
-import tkinter as tk
-from utils.exercise_selector import ExerciseSelector
+import streamlit as st
+from streamlit_autorefresh import st_autorefresh
 import utils.file_operations as file_ops
-from utils.workout_timer import WorkoutTimerGUI
-import webbrowser
+from utils.exercise_selector import ExerciseSelector
+
+# Initialize session state.
+# Workout creation variables.
+if "exercises" not in st.session_state:
+    st.session_state.exercises = []
+if "timer_config" not in st.session_state:
+    st.session_state.timer_config = {}
+if "selector" not in st.session_state:
+    st.session_state.selector = ExerciseSelector("exercises.json")
+if "num_exercises" not in st.session_state:
+    st.session_state.num_exercises = 0
+if "saved_exercises" not in st.session_state:
+    st.session_state.saved_exercises = {}
+
+# Keep track of different modes.
+if "loading_screen" not in st.session_state:
+    st.session_state.loading_screen = True
+if "new_workout_screen" not in st.session_state:
+    st.session_state.new_workout_screen = False
+if "create_exercise_screen" not in st.session_state:
+    st.session_state.create_exercise_screen = False
+if "preview_screen" not in st.session_state:
+    st.session_state.preview_screen = False
+if "save_workout" not in st.session_state:
+    st.session_state.save_workout = False
+if "save_timer" not in st.session_state:
+    st.session_state.save_timer = False
+if "run_timer" not in st.session_state:
+    st.session_state.run_timer = False
+
+# Timer states.
+if "paused" not in st.session_state:
+    st.session_state.paused = False
+if "round" not in st.session_state:
+    st.session_state.round = 1
+if "exercise_index" not in st.session_state:
+    st.session_state.exercise_index = 0
+if "phase" not in st.session_state:
+    st.session_state.phase = "WORK"
+if "time_remaining" not in st.session_state:
+    st.session_state.time_remaining = 0
+if "time_elapsed" not in st.session_state:
+    st.session_state.time_elapsed = 0
+if "step_count" not in st.session_state:
+    st.session_state.step_count = 0
 
 
-class WorkoutGenerator:
-    def __init__(self, root):
-        self.root = root
-        self.root.title("Workout Timer Creator")
-        self.selector = ExerciseSelector("exercises.json")
-        self.workout_timer = WorkoutTimerGUI()
-        self.exercises = []
-        self.num_exercises = 0
-        self.exercise_imgs = {}
+def show_exercise_link(exercise):
+    """Show the exercise link either as an image or a HTML link."""
+    if exercise["link"] and exercise["link"].endswith(("jpg", "png")):
+        _, col2, _ = st.columns(3)
+        with col2:
+            st.image(exercise["link"], width=300)
+    elif exercise["link"]:
+        st.video(exercise["link"], muted=True)
 
-        # Timer config.
-        self.timer_config = {}
 
-        # Main Menu
-        self.main_menu()
+def create_workout(selected_workout, selected_timer):
+    """Transition from loading workout screen to either inputting new workout params or loading the saved workout/timer config."""
+    # Load selected workout/timer if applicable
+    if selected_timer:
+        st.session_state.timer_config = file_ops.load_timer_config(selected_timer)
+    if selected_workout:
+        st.session_state.saved_exercises = file_ops.load_workouts(selected_workout)
+        st.session_state.num_exercises = len(st.session_state.saved_exercises)
+        st.session_state.create_exercise_screen = True
+    else:
+        st.session_state.new_workout_screen = True
 
-    def main_menu(self):
-        """Create the main menu."""
-        frame = tk.Frame(self.root)
-        frame.pack(padx=100, pady=100)
+    st.session_state.loading_screen = False
 
-        # Buttons for creating a workout and loading saved data.
-        tk.Label(frame, text="Load Workout:", font=("Arial", 14)).pack()
-        loaded_workout = ttk.Combobox(
-            frame,
-            values=[
-                f
-                for f in os.listdir(file_ops.SAVED_WORKOUTS_PATH)
-                if os.path.isfile(os.path.join(file_ops.SAVED_WORKOUTS_PATH, f))
-            ],
-            state="readonly",
-            width=20,
-        )
-        loaded_workout.pack(pady=10)
 
-        tk.Label(frame, text="Load Timer:", font=("Arial", 14)).pack()
-        loaded_timer = ttk.Combobox(
-            frame,
-            values=[
-                f
-                for f in os.listdir(file_ops.SAVED_TIMERS_PATH)
-                if os.path.isfile(os.path.join(file_ops.SAVED_TIMERS_PATH, f))
-            ],
-            state="readonly",
-            width=20,
-        )
-        loaded_timer.pack(pady=10)
+def select_exercises():
+    """Transition from inputting new workout params to selecting exercises."""
+    st.session_state.new_workout_screen = False
+    st.session_state.create_exercise_screen = True
 
-        # Input number of exercises if not loading a saved workout.
-        tk.Button(
-            frame,
-            text="Create Workout",
-            command=lambda: self.create_workout(loaded_workout, loaded_timer),
-        ).pack(pady=10)
 
-    def create_workout(self, loaded_workout, loaded_timer):
-        """Create a new workout or load a workout/timer config."""
-        if loaded_timer.get():
-            self.timer_config = file_ops.load_timer_config(loaded_timer.get())
+def preview_workout(exercise_entries, timer_config):
+    """Select exercises based on user input and transition from inputting exercises to previewing the workout."""
+    # Reset saved exercises.
+    st.session_state.exercises = []
+    st.session_state.timer_config = timer_config
 
-        if loaded_workout.get():
-            self.exercises = file_ops.load_workouts(loaded_workout.get())
-            self.num_exercises = len(self.exercises)
-            self.create_exercise_slots(None, None)
-        else:
-            self.input_new_workout_params()
+    for i, entry in enumerate(exercise_entries, 1):
+        manual_entry, exercise_type, body_part = entry
+        exercise_name = None
+        link = None
 
-    def input_new_workout_params(self):
-        """Input the number of exercises."""
-        # Clear previous content.
-        for widget in self.root.winfo_children():
-            widget.destroy()
+        if manual_entry:
+            exercise_name = manual_entry
+        elif exercise_type or body_part:
+            exercise_name, link = st.session_state.selector.select_exercise(
+                exercise_type, body_part
+            )
 
-        frame = tk.Frame(self.root)
-        frame.pack(pady=20)
-
-        # Input number of exercises.
-        tk.Label(frame, text="Number of Exercises:", font=("Arial", 14)).pack()
-        num = tk.Entry(frame, width=5)
-        num.pack(pady=5)
-
-        # Select no equipment or with equipment.
-        tk.Label(frame, text="Equipment?", font=("Arial", 14)).pack()
-        equipment = ttk.Combobox(
-            frame,
-            values=["No Equipment", "Equipment"],
-            state="readonly",
-            width=20,
-        )
-        equipment.pack(pady=10)
-
-        tk.Button(
-            frame,
-            text="Create Exercise Slots",
-            command=lambda: self.create_exercise_slots(num, equipment),
-        ).pack(pady=10)
-
-    def create_exercise_slots(self, num_exercise_entry, equipment_entry):
-        """Create slots for exercises and timer configuration in one window."""
-        if num_exercise_entry:
-            try:
-                self.num_exercises = int(num_exercise_entry.get())
-            except ValueError:
-                messagebox.showerror(
-                    "Error", "Please enter a valid number of exercises!"
+        if exercise_name:
+            if exercise_name in st.session_state.saved_exercises:
+                st.session_state.exercises.append(
+                    st.session_state.saved_exercises[exercise_name]
                 )
-                return
-        if equipment_entry:
-            equipment = equipment_entry.get() == "Equipment"
-            self.selector = (
-                ExerciseSelector("exercises.json")
-                if equipment
-                else ExerciseSelector("no_equipment_exercises.json")
-            )
-
-        if self.num_exercises <= 0:
-            messagebox.showerror(
-                "Error", "Number of exercises must be greater than zero!"
-            )
-            return
-
-        # Clear previous content
-        for widget in self.root.winfo_children():
-            widget.destroy()
-
-        frame = tk.Frame(self.root)
-        frame.pack(pady=20)
-
-        self.exercise_entries = []
-
-        # Section: Exercise Selection
-        tk.Label(frame, text="Configure Exercises:", font=("Arial", 16)).pack(pady=10)
-        for i in range(self.num_exercises):
-            exercise = None
-            if i < len(self.exercises):
-                exercise = self.exercises[i]
-
-            tk.Label(frame, text=f"Exercise {i + 1}:", font=("Arial", 12)).pack(
-                anchor="w", pady=2
-            )
-
-            # Manual entry option with placeholder text
-            manual_entry = tk.Entry(
-                frame,
-                width=30,
-                fg=("black" if exercise else "grey"),
-            )
-            placeholder_text = "Enter custom exercise (optional)"
-            manual_entry.insert(
-                0,
-                (exercise["name"] if exercise else placeholder_text),
-            )
-
-            # Bind events to handle placeholder behavior
-            def on_focus_in(event, entry=manual_entry, placeholder=placeholder_text):
-                if entry.get() == placeholder:
-                    entry.delete(0, tk.END)
-                    entry.config(fg="black")
-
-            def on_focus_out(event, entry=manual_entry, placeholder=placeholder_text):
-                if entry.get() == "":
-                    entry.insert(0, placeholder)
-                    entry.config(fg="grey")
-
-            manual_entry.bind("<FocusIn>", on_focus_in)
-            manual_entry.bind("<FocusOut>", on_focus_out)
-            manual_entry.pack(anchor="w", pady=2)
-
-            # Random selection option
-            random_frame = tk.Frame(frame)
-            random_frame.pack(anchor="w", pady=5)
-
-            type_label = tk.Label(random_frame, text="Type:")
-            type_label.grid(row=0, column=0, padx=5)
-            type_box = ttk.Combobox(
-                random_frame,
-                values=self.selector.exercise_categories(),
-                state="readonly",
-                width=12,
-            )
-            type_box.grid(row=0, column=1, padx=5)
-
-            body_part_label = tk.Label(random_frame, text="Body Part:")
-            body_part_label.grid(row=0, column=2, padx=5)
-            body_part_box = ttk.Combobox(
-                random_frame,
-                values=["legs", "upper_body", "abs", "cardio"],
-                state="readonly",
-                width=12,
-            )
-            body_part_box.grid(row=0, column=3, padx=5)
-
-            self.exercise_entries.append((manual_entry, type_box, body_part_box))
-
-        # Section: Timer Configuration
-        tk.Label(frame, text="Configure Timer:", font=("Arial", 16)).pack(pady=10)
-
-        # Number of Rounds
-        tk.Label(frame, text="Number of Rounds:", font=("Arial", 12)).pack(
-            anchor="w", pady=2
-        )
-        num_rounds_entry = tk.Entry(frame, width=10)
-        if self.timer_config.get("rounds"):
-            num_rounds_entry.insert(0, self.timer_config["rounds"])
-        num_rounds_entry.pack(anchor="w", pady=5)
-
-        # Work Duration
-        tk.Label(frame, text="Work Duration (seconds):", font=("Arial", 12)).pack(
-            anchor="w", pady=2
-        )
-        work_duration_entry = tk.Entry(frame, width=10)
-        if self.timer_config.get("work_duration"):
-            work_duration_entry.insert(0, self.timer_config["work_duration"])
-        work_duration_entry.pack(anchor="w", pady=5)
-
-        # Rest Duration
-        tk.Label(frame, text="Rest Duration (seconds):", font=("Arial", 12)).pack(
-            anchor="w", pady=2
-        )
-        rest_duration_entry = tk.Entry(frame, width=10)
-        if self.timer_config.get("rest_duration"):
-            rest_duration_entry.insert(0, self.timer_config["rest_duration"])
-        rest_duration_entry.pack(anchor="w", pady=5)
-
-        # Buttons
-        tk.Button(
-            frame,
-            text="Preview Workout",
-            command=lambda: self.preview_workout(
-                num_rounds_entry, work_duration_entry, rest_duration_entry
-            ),
-        ).pack(pady=20)
-
-    def preview_workout(
-        self, num_rounds_entry, work_duration_entry, rest_duration_entry
-    ):
-        """Show a preview of the workout and timer settings after validation."""
-        loaded_exercises = len(self.exercises) != 0
-        if not loaded_exercises:
-            self.exercises = []
-
-        for i, entry in enumerate(self.exercise_entries):
-            manual_entry, type_box, body_part_box = entry
-            manual_name = manual_entry.get().strip()
-            exercise_name = None
-            link = None
-            exercise_type = None
-            body_part = None
-
-            # Validate manual entry or random selection
-            if manual_name and manual_name != "Enter custom exercise (optional)":
-                exercise_name = manual_name
             else:
-                exercise_type = type_box.get()
-                body_part = body_part_box.get()
-                if exercise_type and body_part:
-                    exercise_name, link = self.selector.select_exercise(
-                        exercise_type, body_part
-                    )
-                elif exercise_type:
-                    exercise_name, link = self.selector.select_exercise(
-                        exercise_type, None
-                    )
-                elif body_part:
-                    exercise_name, link = self.selector.select_exercise(None, body_part)
-                else:
-                    # If nothing is input, show an error.
-                    messagebox.showerror(
-                        "Error",
-                        f"Please fill out all exercise fields for Exercise {i + 1} correctly.\n"
-                        "Ensure you select at least one of type and body part for random exercises or manually input an exercise.",
-                    )
-                    return  # Prevent proceeding to preview
-
-            if exercise_name and not loaded_exercises:
-                self.exercises.append(
+                st.session_state.exercises.append(
                     {
                         "name": exercise_name,
                         "link": link,
@@ -291,123 +113,254 @@ class WorkoutGenerator:
                         "body_part": body_part,
                     }
                 )
-                self.selector.remove_exercise(exercise_name)
-            elif not loaded_exercises:
-                # If an exercise is empty or invalid, show an error
-                messagebox.showerror(
-                    "Error",
-                    f"Exercise {i + 1} could not be found for this combination of type and body part.",
-                )
-                return  # Prevent proceeding to preview
-
-        if not self.exercises:
-            messagebox.showerror("Error", "No exercises selected!")
-            return
-
-        # Validate timer settings
-        try:
-            work_duration = int(work_duration_entry.get())
-            rest_duration = int(rest_duration_entry.get())
-            rounds = int(num_rounds_entry.get())
-        except ValueError:
-            messagebox.showerror(
-                "Error", "Please enter valid numeric values for the timer settings."
+            st.session_state.selector.remove_exercise(exercise_name)
+        else:
+            # If an exercise is empty or invalid, show an error.
+            st.error(
+                f"Exercise {i} could not be found for this combination of type ({exercise_type}) and body part ({body_part})."
             )
-            return
 
-        if work_duration <= 0 or rest_duration < 0 or rounds <= 0:
-            messagebox.showerror("Error", "Timer values must be positive numbers.")
-            return
+    st.session_state.create_exercise_screen = False
+    st.session_state.preview_screen = True
 
-        self.timer_config = {
-            "work_duration": work_duration,
-            "rest_duration": rest_duration,
-            "rounds": rounds,
-        }
 
-        # If all validations pass, proceed to the preview screen
-        self.show_preview_screen()
+def back_to_edit():
+    """Transition from workout preview screen back to the execise selection screen."""
+    # Save current exercises.
+    st.session_state.saved_exercises = {}
+    for exercise in st.session_state.exercises:
+        st.session_state.saved_exercises[exercise["name"]] = exercise
 
-    def show_preview_screen(self):
-        """Display the preview screen after successful validation."""
-        # Clear window and show preview screen
-        for widget in self.root.winfo_children():
-            widget.destroy()
+    st.session_state.preview_screen = False
+    st.session_state.create_exercise_screen = True
 
-        frame = tk.Frame(self.root)
-        frame.pack(padx=20, pady=20)
 
-        tk.Label(frame, text="Workout Preview", font=("Arial", 16)).pack(pady=10)
+def run_timer():
+    """Transition from the workout preview screen to the workout timer."""
+    # Set up timer start conditions.
+    st.session_state.round = 1
+    st.session_state.exercise_index = 0
+    st.session_state.phase = "WORK"
+    st.session_state.time_remaining = st.session_state.timer_config["work_duration"]
+    st.session_state.time_elapsed = 0
 
-        for i, exercise in enumerate(self.exercises, 1):
-            tk.Label(frame, text=f"{i}. {exercise['name']}", font=("Arial", 12)).pack(
-                anchor="w"
-            )
-            # Show the exercise image or link to video.
-            if exercise["link"][-3:] == "jpg" or exercise["link"][-3:] == "png":
-                img = Image.open(exercise["link"])  # Load the image file
-                img = img.resize((200, 200))  # Resize the image (optional)
-                img = ImageTk.PhotoImage(img)  # Convert to PhotoImage
-                self.exercise_imgs[exercise["name"]] = img
-                tk.Label(frame, image=img).pack()
-            else:
-                video_link = tk.Label(
-                    frame,
-                    text=f"{exercise['name']} example link",
-                    fg="blue",
-                    cursor="hand2",
-                    font=("Arial", 12, "underline"),
-                )
-                video_link.pack(pady=10)
-                # Bind the click event to the open_link function
-                video_link.bind(
-                    "<Button-1>", lambda e, link=exercise["link"]: webbrowser.open(link)
-                )
+    st.session_state.preview_screen = False
+    st.session_state.run_timer = True
 
-        timer_info = (
-            f"Timer: {self.timer_config['work_duration']}s work, "
-            f"{self.timer_config['rest_duration']}s rest, {self.timer_config['rounds']} rounds"
+
+# Main Title
+st.title("🏋️ Workout Generator")
+
+# Start with loading screen.
+if st.session_state.loading_screen:
+    # Load existing workouts and timers
+    saved_workouts = [f for f in os.listdir(file_ops.SAVED_WORKOUTS_PATH)]
+    saved_timers = [f for f in os.listdir(file_ops.SAVED_TIMERS_PATH)]
+
+    selected_workout = st.selectbox("Load Workout:", [""] + saved_workouts)
+    selected_timer = st.selectbox("Load Timer Config:", [""] + saved_timers)
+
+    # Button to start creating a new workout
+    st.button(
+        "Create Workout",
+        on_click=lambda: create_workout(selected_workout, selected_timer),
+    )
+
+
+if st.session_state.new_workout_screen:
+    st.session_state.selector = ExerciseSelector(
+        "exercises.json"
+        if st.radio("Equipment?", ["No Equipment", "Equipment"]) == "Equipment"
+        else "no_equipment_exercises.json"
+    )
+    num_exercises = st.number_input(
+        "Number of Exercises:", min_value=1, max_value=50, value=4
+    )
+    st.session_state.num_exercises = num_exercises
+
+    st.button("Enter", on_click=select_exercises)
+
+# Create Exercise Slots
+if st.session_state.create_exercise_screen:
+    # Exercise and Timer Configuration
+    st.header("Exercise and Timer Configuration")
+
+    # Exercise Configuration
+    st.subheader("Configure Exercises")
+    exercise_entries = []
+
+    for i in range(st.session_state.num_exercises):
+        saved_exercise = None
+        if i < len(st.session_state.saved_exercises):
+            saved_exercise = list(st.session_state.saved_exercises.keys())[i]
+        manual_entry = st.text_input(
+            f"Exercise {i + 1}",
+            value=(saved_exercise if saved_exercise else ""),
+            placeholder=(
+                "Enter custom exercise (optional)" if not saved_exercise else None
+            ),
         )
-        tk.Label(frame, text=timer_info, font=("Arial", 12)).pack(pady=10)
 
-        tk.Button(
-            frame,
-            text="Save Workout",
-            command=lambda: file_ops.input_filename(
-                self.root, file_ops.save_workout, self.exercises
-            ),
-        ).pack(pady=5)
-        tk.Button(
-            frame,
-            text="Save Timer Config",
-            command=lambda: file_ops.input_filename(
-                self.root, file_ops.save_timer_config, self.timer_config
-            ),
-        ).pack(pady=5)
+        # Create two columns
+        col1, col2 = st.columns(2)
+        with col1:
+            exercise_type = st.selectbox(
+                f"Type of Exercise {i + 1}",
+                options=[""] + st.session_state.selector.exercise_categories(),
+            )
 
-        # Add Back to Edit button
-        tk.Button(
-            frame,
-            text="Back to Edit",
-            command=lambda: self.create_exercise_slots(None, None),
-        ).pack(pady=5)
+        with col2:
+            body_part = st.selectbox(
+                f"Body Part for Exercise {i + 1}",
+                options=["", "legs", "upper_body", "abs", "cardio"],
+            )
+        exercise_entries.append((manual_entry, exercise_type, body_part))
 
-        # Add Start Timer button
-        tk.Button(
-            frame,
-            text="Start Timer",
-            command=lambda: self.workout_timer.run_timer_with_gui(
-                self.root,
-                self.exercises,
-                self.exercise_imgs,
-                self.timer_config["work_duration"],
-                self.timer_config["rest_duration"],
-                self.timer_config["rounds"],
-            ),
-        ).pack(pady=20)
+    # Timer Configuration
+    st.subheader("Configure Timer")
+    timer_config = {}
+    timer_config["rounds"] = st.number_input(
+        "Number of Rounds:",
+        min_value=1,
+        value=(st.session_state.timer_config.get("rounds", 3)),
+    )
+    timer_config["work_duration"] = st.number_input(
+        "Work Duration (seconds):",
+        min_value=1,
+        value=st.session_state.timer_config.get("work_duration", 30),
+    )
+    timer_config["rest_duration"] = st.number_input(
+        "Rest Duration (seconds):",
+        min_value=0,
+        value=st.session_state.timer_config.get("rest_duration", 15),
+    )
+
+    # Save or Preview Options
+    st.button(
+        "Preview Workout",
+        on_click=lambda: preview_workout(exercise_entries, timer_config),
+    )
+
+# Workout Preview
+if st.session_state.preview_screen:
+    st.header("Workout Preview", divider=True)
+    for i, exercise in enumerate(st.session_state.exercises, 1):
+        st.markdown(f"#### {i}. {exercise['name']}")
+        show_exercise_link(exercise)
+
+    timer_info = st.session_state.timer_config
+    st.subheader("Time:", divider=True)
+    st.markdown(
+        f"#### Rounds: {timer_info['rounds']}, Work: {timer_info['work_duration']}s, "
+        f"Rest: {timer_info['rest_duration']}s"
+    )
+    st.button("Start Timer", on_click=run_timer)
+
+    if st.button("Save Workout"):
+        st.session_state.save_workout = True
+
+    if st.button("Save Timer Config"):
+        st.session_state.save_timer = True
+
+    st.button("Back to Edit", on_click=back_to_edit)
 
 
-if __name__ == "__main__":
-    root = tk.Tk()
-    app = WorkoutGenerator(root)
-    root.mainloop()
+def save_workout(filename):
+    file_ops.save_workout(filename, st.session_state.exercises)
+    st.session_state.save_workout = False
+
+
+def save_timer_config(filename):
+    file_ops.save_timer_config(filename, st.session_state.timer_config)
+    st.session_state.save_timer = False
+
+
+if st.session_state.save_workout:
+    filename = st.text_input("Workout Filename")
+    st.button("Save", on_click=lambda: save_workout(filename))
+
+if st.session_state.save_timer:
+    filename = st.text_input("Timer Filename")
+    st.button("Save", on_click=lambda: save_timer_config(filename))
+
+
+def update_timer():
+    """Update the GUI timer labels and progress bars."""
+    # Find the current exercise.
+    exercise = st.session_state.exercises[st.session_state.exercise_index]
+    # Display current phase and exercise
+    st.subheader(f"Round: {st.session_state.round}", divider=True)
+    if st.session_state.phase == "WORK":
+        st.markdown(
+            f"<div style='text-align: center; font-size: 24px;'>🚀 Exercise: {exercise['name']}</div>",
+            unsafe_allow_html=True,
+        )
+        show_exercise_link(exercise)
+    elif st.session_state.phase == "REST":
+        st.subheader("😌 Rest")
+
+    # Display time remaining.
+    mins, secs = divmod(st.session_state.time_remaining, 60)
+    st.markdown(
+        f"<div style='text-align: center; font-size: 24px;'>{mins:02}:{secs:02}</div>",
+        unsafe_allow_html=True,
+    )
+
+    # Display progress bars.
+    st.progress(
+        st.session_state.step_count
+        / (
+            st.session_state.timer_config["rounds"] * st.session_state.num_exercises * 2
+        ),
+        text="Workout Progress",
+    )
+
+
+if st.session_state.run_timer:
+    if st.session_state.round <= st.session_state.timer_config["rounds"]:
+        update_timer()
+        if not st.session_state.paused:
+            st.session_state.time_remaining -= 1
+            st.session_state.time_elapsed += 1
+
+            if st.session_state.time_remaining < 0:
+                st.session_state.step_count += 1
+                # If we were in a rest phase, go to a work phase and increment the exercise index.
+                if st.session_state.phase == "REST":
+                    st.session_state.phase = "WORK"
+                    st.session_state.time_remaining = st.session_state.timer_config[
+                        "work_duration"
+                    ]
+                    # If we just finished the last exercise, go to the next round.
+                    if (
+                        st.session_state.exercise_index
+                        == st.session_state.num_exercises - 1
+                    ):
+                        st.session_state.round += 1
+                        st.session_state.exercise_index = 0
+                    else:
+                        st.session_state.exercise_index += 1
+                # If we were in a work phase, go to a rest phase.
+                elif st.session_state.phase == "WORK":
+                    st.session_state.phase = "REST"
+                    st.session_state.time_remaining = st.session_state.timer_config[
+                        "rest_duration"
+                    ]
+                # Reset time elapsed.
+                st.session_state.time_elapsed = 0
+            # Timer controls
+            st.button(
+                "⏸️ Pause",
+                on_click=lambda: setattr(st.session_state, "paused", True),
+            )
+            # Non-blocking countdown logic
+            st_autorefresh(interval=1000, limit=None)
+        else:
+            st.button(
+                "▶️ Resume",
+                on_click=lambda: setattr(st.session_state, "paused", False),
+            )
+    else:
+        # Workout complete
+        st.progress(1.0, text="Workout Progress")
+        st.success("🎉 Workout Complete!")
