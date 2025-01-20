@@ -214,5 +214,49 @@
                 "link": "https://www.youtube.com/watch?v=TU8QYVW0gDU"
             }
         ]
+    },
+    "mobility": {
+        "legs": [
+            {
+                "name": "Single Leg Tap",
+                "link": "https://www.youtube.com/watch?v=oqEUz867eKs"
+            },
+            {
+                "name": "Forward Lunge",
+                "link": "https://www.youtube.com/watch?v=g8-Ge9S0aUw"
+            },
+            {
+                "name": "Reverse Lunge",
+                "link": "https://www.youtube.com/watch?v=xrPteyQLGAo"
+            },
+            {
+                "name": "Step Up",
+                "link": "https://www.youtube.com/watch?v=DxUNi119Qzs"
+            },
+            {
+                "name": "ATG Split Squat",
+                "link": "https://www.youtube.com/watch?v=py0ovq2AIEw"
+            },
+            {
+                "name": "Skater Jumps",
+                "link": "https://www.youtube.com/watch?v=Xz27DudBfSs"
+            },
+            {
+                "name": "Deep Squat",
+                "link": "https://www.youtube.com/watch?v=dfg0wxIGPIc"
+            },
+            {
+                "name": "Hip Lift",
+                "link": "https://www.youtube.com/watch?v=6TfSyx1F_hU"
+            },
+            {
+                "name": "Glute Bridge",
+                "link": "exercises/glute_bridge.jpg"
+            },
+            {
+                "name": "Anterior Tibialis Raise",
+                "link": "https://www.youtube.com/watch?v=VzIcGAgBiaM"
+            }
+        ]
     }
 }

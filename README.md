@@ -1,4 +1,4 @@
-# 🏋️ Workout Timer Program
+# 🏋️ Workout Generator Program
 
 A customizable workout timer application that allows users to create, save, and load workouts with dynamic configurations. Ideal for fitness enthusiasts, trainers, and anyone looking for a personalized workout experience.
 
@@ -26,12 +26,18 @@ A customizable workout timer application that allows users to create, save, and 
 - Python 3.6 or later
 - Required packages: Install via `pip`:
   ```bash
-  pip install tk
+  pip install streamlit
+  pip install streamlit-autorefresh
 
-### **Installation**
+### **Running Locally**
 
-Follow these steps to set up the Workout Timer program:
+Follow these steps to set up the Workout Generator program locally:
 
 1. **Clone the repository.**  
 2. **Install requirements.**
-3. **Run workout_generator.py.**
+3. ```bash
+  python -m streamlit workout_generator.py
+
+### **Running On Mobile or Web**
+
+You can also run the app on the web or mobile at: tiff-workout-generator.streamlit.app
