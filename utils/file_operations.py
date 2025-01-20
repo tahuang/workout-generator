@@ -1,6 +1,5 @@
 import json
 import os
-import tkinter as tk
 
 SAVED_WORKOUTS_PATH = "saved_data/workouts/"
 SAVED_TIMERS_PATH = "saved_data/timers/"
@@ -49,25 +48,3 @@ def load_timer_config(filename):
         with open(full_path, "r") as f:
             return json.load(f)
     return []
-
-
-def save_data(frame, filename_entry, func, *args):
-    """Save data and remove the given frame."""
-    func(filename_entry.get(), *args)
-    frame.destroy()
-
-
-def input_filename_tk(root, func, *args):
-    """Choose a filename to save data for TKinter."""
-    frame = tk.Frame(root)
-    frame.pack(pady=20)
-
-    tk.Label(frame, text="Filename:", font=("Arial", 12)).pack(anchor="w", pady=2)
-    filename_entry = tk.Entry(frame, width=20)
-    filename_entry.pack(anchor="w", pady=5)
-
-    tk.Button(
-        frame,
-        text="Save",
-        command=lambda: save_data(frame, filename_entry, func, *args),
-    ).pack(pady=5)
