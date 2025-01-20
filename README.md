@@ -35,7 +35,8 @@ Follow these steps to set up the Workout Generator program locally:
 
 1. **Clone the repository.**  
 2. **Install requirements.**
-3. ```bash python -m streamlit workout_generator.py
+3. ```bash
+   python -m streamlit run workout_generator.py
 
 ### **Running On Mobile or Web**
 
