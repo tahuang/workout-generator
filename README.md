@@ -35,9 +35,8 @@ Follow these steps to set up the Workout Generator program locally:
 
 1. **Clone the repository.**  
 2. **Install requirements.**
-3. ```bash
-  python -m streamlit workout_generator.py
+3. ```bash python -m streamlit workout_generator.py
 
 ### **Running On Mobile or Web**
 
-You can also run the app on the web or mobile at: tiff-workout-generator.streamlit.app
+You can also run the app on the web or mobile at: [tiff-workout-generator.streamlit.app](https://tiff-workout-generator.streamlit.app/)
